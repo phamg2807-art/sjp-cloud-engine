@@ -1,20 +1,17 @@
-from flask import Flask, request, jsonify
-import os
+from flask import Flask, jsonify
+from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
 
-# This is a sample task
-@app.route('/run-task', methods=['POST'])
-def run_task():
-    data = request.json
-    task_name = data.get('task')
-    # Here you would trigger your automation logic
-    return jsonify({"status": "success", "message": f"Task {task_name} started!"})
+@app.route('/join-game', methods=['POST'])
+def join_game():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True) # Runs without a screen
+        page = browser.new_page()
+        # Your code to login and navigate to game URL would go here
+        page.goto("https://www.roblox.com/games/...") 
+        # Click the 'Play' button logic
+        browser.close()
+    return jsonify({"status": "joined"})
 
-@app.route('/')
-def home():
-    return "SjpWorkspace Engine is active!"
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+# ... rest of your Flask code
